@@ -56,13 +56,32 @@ function getTodayString() {
       const sponsor = document.getElementById('campaignSponsor').value.trim();
       const name = document.getElementById('campaignName').value.trim();
       const type = document.getElementById('campaignType').value;
-      const serials = document.getElementById('campaignSeries').value.trim().split('\n').filter(Boolean);
+      const serials = [...new Set( //Usar un Set deberia eliminar duplicados
+        document.getElementById('campaignSeries')
+          .value
+          .split('\n')//Separa por lineas
+          .map(s => s.trim())//Quita espacios invisibles
+          .filter(s => s !== "") //Quita lineas vacías
+      )];
       if (!sponsor || !name || !type || serials.length === 0) return alert('Completa todos los campos de Campañas.');
 
       let xml = `<?xml version = "1.0" encoding = "utf-8"?>\n<script version = "1.0" xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance">\n  <context>\n    <estate signature = "${sponsor}">\n    </estate>\n  </context>\n\n  <campaign type= "${type}" name = "${name}">\n`;
       serials.forEach(s => xml += `    <target signature = "${s}"/>\n`);
       xml += '  </campaign>\n</script>';
-
+          
+      //Aviso si hubo duplicados
+      const rawSerials = document.getElementById('campaignSeries')
+        .value
+        .split('\n')
+        .map(s => s.trim())
+        .filter(s => s !== "");
+          
+      document.getElementById('campaignSeries').value = serials.join('\n');
+          
+      if (rawSerials.length !== serials.length) {
+        const duplicados = rawSerials.length - serials.length;
+        alert(`Se eliminaron ${duplicados} series duplicadas automáticamente. 🫡`);
+      }
       downloadXML(xml, `Campaña ${getTodayString()}.xie`);
     }
 
@@ -70,13 +89,32 @@ function getTodayString() {
       const sponsor = document.getElementById('campaignSponsor').value.trim();
       const name = document.getElementById('campaignName').value.trim();
       const type = document.getElementById('campaignType').value;
-      const serials = document.getElementById('campaignSeries').value.trim().split('\n').filter(Boolean);
+      const serials = [...new Set( //Usar un Set deberia eliminar duplicados
+        document.getElementById('campaignSeries')
+          .value
+          .split('\n') //Separa por lineas
+          .map(s => s.trim()) //Quita espacios invisibles
+          .filter(s => s !== "") //Quita lineas vacías
+      )];
       if (!sponsor || !name || !type || serials.length === 0) return alert('Completa todos los campos para eliminar de la campaña.');
 
       let xml = `<?xml version = "1.0" encoding = "utf-8"?>\n<script version = "1.0" xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance">\n  <context>\n    <estate signature = "${sponsor}">\n    </estate>\n  </context>\n\n  <campaign type= "${type}" name = "${name}">\n`;
       serials.forEach(s => xml += `    <deleteTarget signature = "${s}"/>\n`);
       xml += '  </campaign>\n</script>';
 
+      //Aviso si hubo duplicados
+      const rawSerials = document.getElementById('campaignSeries')
+        .value
+        .split('\n')
+        .map(s => s.trim())
+        .filter(s => s !== "");
+
+      document.getElementById('campaignSeries').value = serials.join('\n');
+      
+      if (rawSerials.length !== serials.length) {
+        const duplicados = rawSerials.length - serials.length;
+        alert(`Se eliminaron ${duplicados} series duplicadas automáticamente. 🫡`);
+      }
       downloadXML(xml, `EliminarCampaña ${getTodayString()}.xie`);
 }
 
